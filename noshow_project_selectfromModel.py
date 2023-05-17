@@ -153,6 +153,25 @@ for thresh in thresholds:
     score = accuracy_score(y_test, y_predict)
     print("Thresh=%.3f, n=%d, acc:%.2f%%" % (thresh, select_x_train.shape[1], score*100))
 
+'''
+acc :  0.7938116348502668
+소요시간 :  200.53839492797852
+(66316, 5) (22106, 5)
+Thresh=0.050, n=5, acc:79.34%
+(66316, 3) (22106, 3)
+Thresh=0.084, n=3, acc:79.25%
+(66316, 4) (22106, 4)
+Thresh=0.050, n=4, acc:79.25%
+(66316, 6) (22106, 6)
+Thresh=0.042, n=6, acc:79.28%
+(66316, 2) (22106, 2)
+Thresh=0.101, n=2, acc:79.54%
+(66316, 1) (22106, 1)
+Thresh=0.638, n=1, acc:79.53%
+(66316, 7) (22106, 7)
+Thresh=0.035, n=7, acc:79.20%
+'''
+
 ## 2-5. show feature importances
 
 # print(model, " : ", model.feature_importances_) # sequential model has no attribute feature_importances

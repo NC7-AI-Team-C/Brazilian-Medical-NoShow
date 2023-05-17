@@ -5,7 +5,7 @@ import seaborn as sns
 import time
 
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.ensemble import VotingClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
@@ -51,7 +51,7 @@ y = medical_noshow[['No-show']]
 x = x.drop(['PatientId', 'AppointmentID','ScheduledDay'], axis=1)
 # print(x.describe())
 print(x.shape)
-outliers = EllipticEnvelope(contamination=.10)      
+outliers = EllipticEnvelope(contamination=.1)      
 # 이상치 탐지 모델 생성
 outliers.fit(x[['Age']])      
 # 이상치 탐지 모델 훈련
@@ -95,21 +95,13 @@ x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True
 )
 
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
-n_splits = 3
+n_splits = 8
 random_state = 42
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-
-scaler = MinMaxScaler()
-scaler.fit(x_train)
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
-
-n_splits = 5
-kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
 xgb = XGBClassifier(subsample = 1.0, reg_lambda = 0.5, reg_alpha = 0.1, n_estimators = 300, min_child_weight = 1, max_depth = 9, learning_rate = 0.1, gamma = 0.1, colsample_bytree = 1.0, colsample_bynode = 1, colsample_bylevel = 1) 
 # gridSearchCV로 산출한 best_parameter 적용
@@ -145,8 +137,26 @@ print('voting result : ', voting_score)
 # XGBClassifier 's score :  0.7976115081878223
 # LGBMClassifier 's score :  0.7981543472360445
 
-# # 이상치 10% 삭제
+# # 칼럼 전처리, 이상치 10% 삭제
 # CatBoostClassifier 's score :  0.7976605276256844
 # XGBClassifier 's score :  0.7921851667496267
 # LGBMClassifier 's score :  0.7974614235938278
+# voting result :  0.798456943753111
+
+# # 칼럼 전처리, 이상치 0.1% 삭제
+# CatBoostClassifier 's score :  0.7976454607199457
+# XGBClassifier 's score :  0.7915327145121123
+# LGBMClassifier 's score :  0.7965134706814581
+# voting result :  0.7971926647045506
+
+# # # 칼럼 전처리, 이상치 10% 삭제, n_splits = 8
+# CatBoostClassifier 's score :  0.7976605276256844
+# XGBClassifier 's score :  0.7921851667496267
+# LGBMClassifier 's score :  0.7974614235938278
+# voting result :  0.798456943753111
+
+# # # 칼럼 전처리, 이상치 10% 삭제, n_splits = 8, MinMax -> std
+# CatBoostClassifier 's score :  0.7976605276256844
+# XGBClassifier 's score :  0.7922349427575909  # 0.0001상승
+# LGBMClassifier 's score :  0.7974116475858636 # 0.00005하락
 # voting result :  0.798456943753111

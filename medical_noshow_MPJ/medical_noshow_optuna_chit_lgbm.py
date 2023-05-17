@@ -111,6 +111,7 @@ def objectiveLGBM(trial: Trial, x_train, y_train, x_test):
         'l2_leaf_reg' : trial.suggest_float('l2_leaf_reg', 0, 4),
         'random_state' :trial.suggest_int('random_state', 1, 2000)
     }
+
     # 학습 모델 생성
     model = LGBMClassifier(**param)
     LGBM_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
@@ -134,7 +135,40 @@ print(optuna.visualization.plot_param_importances(study))
 optuna.visualization.plot_optimization_history(study)
 plt.show()
 
-
+# [I 2023-05-17 20:42:33,015] Trial 4 finished with value: 0.999710459645313 and parameters: {'n_estimators': 1436, 'depth': 8, 'fold_permutation_block': 113, 'learning_rate': 0.41550106192795455, 'od_pval': 0.3774575184029537, 'l2_leaf_reg': 0.04747778152681992, 'random_state': 1372}. Best is trial 4 with value: 0.999710459645313.
+# Best trial : score 0.999710459645313, /nparams {'n_estimators': 1436, 'depth': 8, 'fold_permutation_block': 113, 'learning_rate': 0.41550106192795455, 'od_pval': 0.3774575184029537, 'l2_leaf_reg': 0.04747778152681992, 'random_state': 1372}
+# Figure({
+#     'data': [{'cliponaxis': False,
+#               'hovertemplate': [od_pval (FloatDistribution):
+#                                 0.04977034021530387<extra></extra>, random_state
+#                                 (IntDistribution):
+#                                 0.09840254533617024<extra></extra>, depth
+#                                 (IntDistribution):
+#                                 0.11071292813161523<extra></extra>,
+#                                 fold_permutation_block (IntDistribution):
+#                                 0.11204092662301418<extra></extra>, n_estimators
+#                                 (IntDistribution):
+#                                 0.16129470311006325<extra></extra>, learning_rate
+#                                 (FloatDistribution):
+#                                 0.22498657558782265<extra></extra>, l2_leaf_reg
+#                                 (FloatDistribution):
+#                                 0.2427919809960105<extra></extra>],
+#               'marker': {'color': 'rgb(66,146,198)'},
+#               'orientation': 'h',
+#               'text': [0.05, 0.10, 0.11, 0.11, 0.16, 0.22, 0.24],
+#               'textposition': 'outside',
+#               'type': 'bar',
+#               'x': [0.04977034021530387, 0.09840254533617024, 0.11071292813161523,
+#                     0.11204092662301418, 0.16129470311006325, 0.22498657558782265,
+#                     0.2427919809960105],
+#               'y': [od_pval, random_state, depth, fold_permutation_block,
+#                     n_estimators, learning_rate, l2_leaf_reg]}],
+#     'layout': {'showlegend': False,
+#                'template': '...',
+#                'title': {'text': 'Hyperparameter Importances'},
+#                'xaxis': {'title': {'text': 'Importance for Objective Value'}},
+#                'yaxis': {'title': {'text': 'Hyperparameter'}}}
+# })
 
 
 

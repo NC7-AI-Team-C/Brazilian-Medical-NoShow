@@ -78,11 +78,6 @@ n_splits = 21
 random_state = 62
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
-scaler = MinMaxScaler()
-scaler.fit(x_train)
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
-
 n_splits = 5
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 

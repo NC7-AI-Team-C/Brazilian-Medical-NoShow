@@ -2,7 +2,7 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 
 
-path = 'C:/Users/bitcamp/Desktop/새 폴더/'
+path = './'
 df = pd.read_csv(path + 'medical_noshow.csv')
 print('Count of rows', str(df.shape[0]))
 print('Count of Columns', str(df.shape[1]))
@@ -71,22 +71,31 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from catboost import CatBoostClassifier # catboost로 돌린다. 
+
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier # catboost로 돌린다.
+from sklearn.ensemble import VotingClassifier 
 # rd_clf = RandomForestClassifier()
 # rd_clf.fit(X_train, y_train)
 
-############################################모델 
-model = CatBoostClassifier()
-
-
-
 
 #####################kfold#########################
-n_splits = 5
-random_state = 42
+n_splits = 21
+random_state = 62
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
+############################################모델 
+xgb = XGBClassifier()
+lgbm = LGBMClassifier()
+cat = CatBoostClassifier()
 
+model = VotingClassifier(
+    estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
+    voting='hard',
+    n_jobs=-1,
+    verbose=0
+)
 
 # y_pred_rd_clf = rd_clf.predict(X_test)
 # clf_report = classification_report(y_test, y_pred_rd_clf)
@@ -112,19 +121,16 @@ start_time = time.time()
 
 model.fit(X_train, y_train)
 
-result = model.score(X_test, y_test)
-score = cross_val_score(model, X_train, y_train, cv=kfold)
-y_predict = cross_val_predict(model, X_test, y_test, cv=kfold )
-acc = accuracy_score(y_test, y_predict)
-
-end_time = time.time() - start_time
-
-print('acc : ', acc)
-print('소요시간 : ', end_time)
-
+classifiers = [cat, xgb, lgbm]
+for model in classifiers:
+    model.fit(X_train, y_train)
+    y_predict = model.predict(X_test)
+    score = accuracy_score(y_test, y_predict)
+    class_name = model.__class__.__name__
+    print(class_name, "'s score : ", score)
 
 '''
-캣부스트/하이퍼파라미터 디폴트입니다.
-acc :  0.9620883098081795
-소요시간 :  98.19628834724426
+CatBoostClassifier 's score :  0.9646217879116902
+XGBClassifier 's score :  0.9643955845095911
+LGBMClassifier 's score :  0.9646670285921101
 '''

@@ -107,3 +107,5 @@ loss, acc = model.evaluate(x_test, y_test)
 print('loss : ', loss)
 print('acc : ', acc)
 print('소요시간 : ', end_time)
+
+# 22222222222222222222222222

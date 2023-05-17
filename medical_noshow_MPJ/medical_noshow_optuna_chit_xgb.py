@@ -134,6 +134,40 @@ optuna.visualization.plot_optimization_history(study)
 plt.show()
 
 
+# [I 2023-05-17 20:53:57,905] Trial 4 finished with value: 1.0 and parameters: {'n_estimators': 2060, 'depth': 12, 'fold_permutation_block': 11, 'learning_rate': 0.49004237355011937, 'od_pval': 0.32505770689105074, 'l2_leaf_reg': 0.023601444789493886, 'random_state': 289}. Best is trial 1 with value: 1.0.
+# Best trial : score 1.0, /nparams {'n_estimators': 1756, 'depth': 9, 'fold_permutation_block': 16, 'learning_rate': 0.903937883973379, 'od_pval': 0.8152770247734845, 'l2_leaf_reg': 0.7307631277792277, 'random_state': 330}
+# Figure({
+#     'data': [{'cliponaxis': False,
+#               'hovertemplate': [od_pval (FloatDistribution):
+#                                 0.0356481823566099<extra></extra>,
+#                                 fold_permutation_block (IntDistribution):
+#                                 0.052850709489488765<extra></extra>, depth
+#                                 (IntDistribution):
+#                                 0.07202539332485579<extra></extra>, l2_leaf_reg
+#                                 (FloatDistribution):
+#                                 0.08845991986447961<extra></extra>, random_state
+#                                 (IntDistribution):
+#                                 0.1699786600643671<extra></extra>, n_estimators
+#                                 (IntDistribution):
+#                                 0.20534654803743904<extra></extra>, learning_rate
+#                                 (FloatDistribution):
+#                                 0.3756905868627597<extra></extra>],
+#               'marker': {'color': 'rgb(66,146,198)'},
+#               'orientation': 'h',
+#               'text': [0.04, 0.05, 0.07, 0.09, 0.17, 0.21, 0.38],
+#               'textposition': 'outside',
+#               'type': 'bar',
+#               'x': [0.0356481823566099, 0.052850709489488765, 0.07202539332485579,
+#                     0.08845991986447961, 0.1699786600643671, 0.20534654803743904,
+#                     0.3756905868627597],
+#               'y': [od_pval, fold_permutation_block, depth, l2_leaf_reg,
+#                     random_state, n_estimators, learning_rate]}],
+#     'layout': {'showlegend': False,
+#                'template': '...',
+#                'title': {'text': 'Hyperparameter Importances'},
+#                'xaxis': {'title': {'text': 'Importance for Objective Value'}},
+#                'yaxis': {'title': {'text': 'Hyperparameter'}}}
+# })
 
 
 

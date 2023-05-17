@@ -14,6 +14,8 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
 
+from sklearn.covariance import EllipticEnvelope
+
 # 1. Data preprocessing #
 
 path = './medical_noshow.csv'
@@ -22,7 +24,16 @@ medical_noshow = pd.read_csv(path)
 # print(medical_noshow.columns)
 # print(medical_noshow.head(10))
 
-x = medical_noshow[['PatientId', 'AppointmentID', 'Gender',	'ScheduledDay', 'AppointmentDay', 'Age', 'Neighbourhood', 'Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism', 'Handcap', 'SMS_received']]
+medical_noshow.AppointmentDay = pd.to_datetime(medical_noshow.AppointmentDay).dt.date
+medical_noshow.ScheduledDay = pd.to_datetime(medical_noshow.ScheduledDay).dt.date
+medical_noshow['PeriodBetween'] = medical_noshow.AppointmentDay - medical_noshow.ScheduledDay
+# convert derived datetime to int
+medical_noshow['PeriodBetween'] = medical_noshow['PeriodBetween'].dt.days
+# print(datasets.PeriodBetween.describe())
+x = medical_noshow[['PatientId', 'AppointmentID', 'Gender',	'ScheduledDay', 
+              'AppointmentDay', 'PeriodBetween', 'Age', 'Neighbourhood', 
+              'Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism', 
+              'Handcap', 'SMS_received']]
 y = medical_noshow[['No-show']]
 
 # print(x.info())
@@ -37,8 +48,22 @@ y = medical_noshow[['No-show']]
 
 ## 1-2. drop useless data ##
 
-x = x.drop(['PatientId', 'AppointmentID'], axis=1)
+x = x.drop(['PatientId', 'AppointmentID','ScheduledDay'], axis=1)
 # print(x.describe())
+print(x.shape)
+outliers = EllipticEnvelope(contamination=.10)      
+# 이상치 탐지 모델 생성
+outliers.fit(x[['Age']])      
+# 이상치 탐지 모델 훈련
+predictions = outliers.predict(x[['Age']])       
+# 이상치 판별 결과
+outlier_indices = np.where(predictions == -1)[0]    
+# 이상치로 판별된 행의 인덱스를 추출
+x = x.drop(outlier_indices) 
+# 데이터프레임에서 이상치 행을 삭제
+y = y.drop(outlier_indices) 
+# 데이터프레임에서 이상치 행을 삭제
+# print(x.shape, y.shape)
 
 ## 1-3. encoding object to int ##
 
@@ -109,3 +134,13 @@ for model in classifiers:
     score = accuracy_score(y_test, y_predict)
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
+
+# # 하이퍼 파라미터 적용
+# CatBoostClassifier 's score :  0.7964353569166742
+# XGBClassifier 's score :  0.7976115081878223
+# LGBMClassifier 's score :  0.7981543472360445
+
+# # 이상치 10% 삭제
+# CatBoostClassifier 's score :  0.7976605276256844
+# XGBClassifier 's score :  0.7921851667496267
+# LGBMClassifier 's score :  0.7974614235938278

@@ -34,6 +34,25 @@ medical_noshow['PeriodBetween'] = medical_noshow.AppointmentDay - medical_noshow
 medical_noshow['PeriodBetween'] = medical_noshow['PeriodBetween'].dt.days
 
 medical_noshow['diseaseCount'] = medical_noshow.Hipertension + medical_noshow.Diabetes + medical_noshow.Alcoholism
+
+medical_noshow = medical_noshow.dropna(axis = 0)    # nan값을 가진 행 드랍
+
+outliers = EllipticEnvelope(contamination=.1)      
+# 이상치 탐지 모델 생성
+outliers.fit(medical_noshow[['Age']])      
+# 이상치 탐지 모델 훈련
+predictions = outliers.predict(medical_noshow[['Age']])       
+# 이상치 판별 결과
+outlier_indices = np.where(predictions == -1)[0]    
+# 이상치로 판별된 행의 인덱스를 추출
+medical_noshow.loc[outlier_indices, 'Age']  = np.nan    #이상치를 nan처리
+# 데이터프레임에서 이상치 행을 삭제
+print(medical_noshow[medical_noshow['PeriodBetween'] < 0])
+medical_noshow[medical_noshow['PeriodBetween'] < 0] = np.nan    #이상치를 nan처리
+medical_noshow = medical_noshow.fillna(np.nan)    #비어있는 데이터를 nan처리
+
+medical_noshow = medical_noshow.dropna(axis = 0)    # nan값을 가진 행 드랍
+
 # print(datasets.PeriodBetween.describe())
 x = medical_noshow[['PatientId', 'AppointmentID', 'Gender',	'ScheduledDay', 
               'AppointmentDay', 'PeriodBetween', 'Age', 'Neighbourhood', 
@@ -57,20 +76,7 @@ x = x.drop(['PatientId', 'AppointmentID','ScheduledDay', 'Hipertension', 'Diabet
 print(x.describe())
 # print(x.shape)
 
-outliers = EllipticEnvelope(contamination=.1)      
-# 이상치 탐지 모델 생성
-outliers.fit(x[['Age', '']])      
-# 이상치 탐지 모델 훈련
-predictions = outliers.predict(x[['Age']])       
-# 이상치 판별 결과
-outlier_indices = np.where(predictions == -1)[0]    
-# 이상치로 판별된 행의 인덱스를 추출
-x = x.drop(outlier_indices) 
-# 데이터프레임에서 이상치 행을 삭제
-y = y.drop(outlier_indices) 
-# 데이터프레임에서 이상치 행을 삭제
-
-print("이상치 정리 후",x.describe())
+# print("이상치 정리 후\n",x.describe())
 # print(x.shape, y.shape)
 
 ## 1-3. encoding object to int ##
@@ -87,17 +93,16 @@ y = LabelEncoder().fit_transform(y.values)
 
 # print(x.describe())
 # print('y:', y[0:8], '...')
-print(x.info())
+# print(x.info())
 
 ## 1-4. fill na data ##
 
-x = x.fillna(np.NaN)
-# # print(x.describe())
+print(x.describe())
 
 ## 1-5. check dataset ##
 
-print('head : \n',x.head(7))
-print('y : ',y[0:7]) ### y : np.array
+# print('head : \n',x.head(7))
+# print('y : ',y[0:7]) ### y : np.array
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True

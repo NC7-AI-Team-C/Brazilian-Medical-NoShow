@@ -149,3 +149,4 @@ print('voting result : ', voting_score)
 # CatBoostClassifier 's score :  0.7976605276256844
 # XGBClassifier 's score :  0.7921851667496267
 # LGBMClassifier 's score :  0.7974614235938278
+# voting result :  0.798456943753111

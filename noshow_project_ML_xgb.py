@@ -106,14 +106,10 @@ x_test = scaler.transform(x_test)
 
 ## 2-3. create model ##
 
-model = CatBoostClassifier(
-     n_estimators = 3744, 
-     depth = 12, 
-     fold_permutation_block = 52, 
-     learning_rate = 0.590550835248644, 
-     od_pval = 0.4950728495185369, 
-     l2_leaf_reg = 1.5544576109556445, 
-     random_state = 622
+model = XGBClassifier(
+    n_estimators = 951,
+    learning_rate = 0.7979977093999802,
+    random_state = 1760
 )
 
 ## 2-4. train model ##

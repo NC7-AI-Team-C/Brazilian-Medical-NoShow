@@ -47,7 +47,7 @@ outlier_indices = np.where(predictions == -1)[0]
 # 이상치로 판별된 행의 인덱스를 추출
 medical_noshow.loc[outlier_indices, 'Age']  = np.nan    #이상치를 nan처리
 # 데이터프레임에서 이상치 행을 삭제
-print(medical_noshow[medical_noshow['PeriodBetween'] < 0])
+# print(medical_noshow[medical_noshow['PeriodBetween'] < 0])
 medical_noshow[medical_noshow['PeriodBetween'] < 0] = np.nan    #이상치를 nan처리
 medical_noshow = medical_noshow.fillna(np.nan)    #비어있는 데이터를 nan처리
 
@@ -203,3 +203,9 @@ print('voting result : ', voting_score)
 # XGBClassifier 's score :  0.7905923344947735
 # LGBMClassifier 's score :  0.796316575410652
 # voting result :  0.7977103036336486
+
+# # 예약일 이후에 진료한 사람 제외 # 왜 하락...?
+# CatBoostClassifier 's score :  0.7951117527004828
+# XGBClassifier 's score :  0.7869978595251133
+# LGBMClassifier 's score :  0.7943152969286674
+# voting result :  0.7959579869580368

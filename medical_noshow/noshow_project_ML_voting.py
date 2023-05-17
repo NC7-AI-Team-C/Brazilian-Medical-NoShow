@@ -127,6 +127,9 @@ model = VotingClassifier(
 
 model.fit(x_train, y_train)
 
+y_voting_predict = model.predict(x_test)
+voting_score = accuracy_score(y_test, y_voting_predict)
+
 classifiers = [cat, xgb, lgbm]
 for model in classifiers:
     model.fit(x_train, y_train)
@@ -134,6 +137,8 @@ for model in classifiers:
     score = accuracy_score(y_test, y_predict)
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
+
+print('voting result : ', voting_score)
 
 # # 하이퍼 파라미터 적용
 # CatBoostClassifier 's score :  0.7964353569166742

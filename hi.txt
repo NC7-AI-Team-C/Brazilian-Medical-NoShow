@@ -1,3 +1,0 @@
-hi git!
-bye git!
-rehi git!

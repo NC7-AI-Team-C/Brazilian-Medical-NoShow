@@ -3,12 +3,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+import optuna
 
 from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
+import optuna
+from optuna import Trial, visualization
+from optuna.samplers import TPESampler
+from sklearn.metrics import mean_absolute_error
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -104,42 +109,36 @@ scaler.fit(x_train)
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
-## 2-3. create model ##
+def objectiveXGB(trial: Trial, x_train, y_train, x_test):
+    param = {
+        'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
+        'learning_rate' : trial.suggest_float('learning_rate', 0, 1),
+        'random_state' :trial.suggest_int('random_state', 1, 2000)
+    }
+    # 학습 모델 생성
+    model = XGBClassifier(**param)
+    XGB_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
+    # 모델 성능 확인
+    score = accuracy_score(XGB_model.predict(x_test), y_test)
+    return score
 
-model = CatBoostClassifier(
-     n_estimators = 3744, 
-     depth = 12, 
-     fold_permutation_block = 52, 
-     learning_rate = 0.590550835248644, 
-     od_pval = 0.4950728495185369, 
-     l2_leaf_reg = 1.5544576109556445, 
-     random_state = 622
-)
+# MAE가 최소가 되는 방향으로 학습을 진행
+# TPESampler : Sampler using TPE (Tree-structured Parzen Estimator) algorithm.
+study = optuna.create_study(direction='maximize', sampler=TPESampler())
 
-## 2-4. train model ##
+# n_trials 지정해주지 않으면, 무한 반복
+study.optimize(lambda trial : objectiveXGB(trial, x, y, x_test), n_trials = 5)
+print('Best trial : score {}, /nparams {}'.format(study.best_trial.value, 
+                                                  study.best_trial.params))
 
-start_time = time.time()
+# 하이퍼파라미터별 중요도를 확인할 수 있는 그래프
+print(optuna.visualization.plot_param_importances(study))
+# 하이퍼파라미터 최적화 과정을 확인
+optuna.visualization.plot_optimization_history(study)
+plt.show()
 
-model.fit(x_train, y_train)
-
-result = model.score(x_test, y_test)
-score = cross_val_score(model, x_train, y_train, cv=kfold)
-y_predict = cross_val_predict(model, x_test, y_test, cv=kfold )
-acc = accuracy_score(y_test, y_predict)
-
-end_time = time.time() - start_time
-
-print('acc : ', acc)
-print('소요시간 : ', end_time)
-
-## 2-5. show feature importances
-
-# print(model, " : ", model.feature_importances_) # sequential model has no attribute feature_importances
-# n_features = x.shape[1]
-# plt.barh(range(n_features), model.feature_importances_, align='center')
-# plt.yticks(np.arange(n_features), ['Gender',	'ScheduledDay', 'AppointmentDay', 'Age', 'Neighbourhood', 'Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism', 'Handcap', 'SMS_received'])
-# plt.title('noshow datset feature input importances')
-# plt.ylabel('feature')
-# plt.xlabel('importance')
-# plt.ylim(-1, n_features)
-# plt.show()
+'''
+    n_estimators = 951,
+    learning_rate = 0.7979977093999802,
+    random_state = 1760 
+'''

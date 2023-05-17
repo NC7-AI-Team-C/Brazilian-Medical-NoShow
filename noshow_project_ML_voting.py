@@ -74,8 +74,8 @@ scaler = MinMaxScaler()
 x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
-n_splits = 3
-random_state = 42
+n_splits = 21
+random_state = 62
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
 scaler = MinMaxScaler()
@@ -87,10 +87,31 @@ n_splits = 5
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
 
 xgb = XGBClassifier(
-    
+    n_estimators = 951,
+    learning_rate = 0.7979977093999802,
+    random_state = 1760
 ) # gridSearchCV로 산출한 best_parameter 적용
-lgbm = LGBMClassifier() # gridSearchCV로 산출한 best_parameter 적용
-cat = CatBoostClassifier() # gridSearchCV로 산출한 best_parameter 적용
+lgbm = LGBMClassifier(
+    learning_rate = 0.006478366591064283, 
+    max_depth = 10, 
+    num_leaves = 29, 
+    feature_fraction = 0.7057579511387295, 
+    bagging_fraction = 0.6653693411687419, 
+    min_data_in_leaf = 96,
+    lambda_l1 = 6.606737188014566, 
+    lambda_l2 = 9.596559651974772, 
+    n_estimators = 370
+) # gridSearchCV로 산출한 best_parameter 적용
+
+cat = CatBoostClassifier(
+    n_estimators = 3744, 
+    depth = 12, 
+    fold_permutation_block = 52, 
+    learning_rate = 0.590550835248644, 
+    od_pval = 0.4950728495185369, 
+    l2_leaf_reg = 1.5544576109556445, 
+    random_state = 622
+) # gridSearchCV로 산출한 best_parameter 적용
 
 model = VotingClassifier(
     estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],

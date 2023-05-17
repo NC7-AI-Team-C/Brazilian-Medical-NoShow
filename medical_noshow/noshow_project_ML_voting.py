@@ -29,10 +29,12 @@ medical_noshow.ScheduledDay = pd.to_datetime(medical_noshow.ScheduledDay).dt.dat
 medical_noshow['PeriodBetween'] = medical_noshow.AppointmentDay - medical_noshow.ScheduledDay
 # convert derived datetime to int
 medical_noshow['PeriodBetween'] = medical_noshow['PeriodBetween'].dt.days
+
+medical_noshow['diseaseCount'] = medical_noshow.Hipertension + medical_noshow.Diabetes + medical_noshow.Alcoholism
 # print(datasets.PeriodBetween.describe())
 x = medical_noshow[['PatientId', 'AppointmentID', 'Gender',	'ScheduledDay', 
               'AppointmentDay', 'PeriodBetween', 'Age', 'Neighbourhood', 
-              'Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism', 
+              'Scholarship', 'diseaseCount', 'Hipertension', 'Diabetes', 'Alcoholism', 
               'Handcap', 'SMS_received']]
 y = medical_noshow[['No-show']]
 
@@ -48,9 +50,10 @@ y = medical_noshow[['No-show']]
 
 ## 1-2. drop useless data ##
 
-x = x.drop(['PatientId', 'AppointmentID','ScheduledDay'], axis=1)
+x = x.drop(['PatientId', 'AppointmentID','ScheduledDay', 'Hipertension', 'Diabetes', 'Alcoholism'], axis=1)
 # print(x.describe())
-print(x.shape)
+# print(x.shape)
+
 outliers = EllipticEnvelope(contamination=.1)      
 # 이상치 탐지 모델 생성
 outliers.fit(x[['Age']])      
@@ -160,3 +163,9 @@ print('voting result : ', voting_score)
 # XGBClassifier 's score :  0.7922349427575909  # 0.0001상승
 # LGBMClassifier 's score :  0.7974116475858636 # 0.00005하락
 # voting result :  0.798456943753111
+
+# # 질병 세개 통합
+# CatBoostClassifier 's score :  0.7973618715778995
+# XGBClassifier 's score :  0.7905425584868093
+# LGBMClassifier 's score :  0.7970134395221503
+# voting result :  0.799054255848681

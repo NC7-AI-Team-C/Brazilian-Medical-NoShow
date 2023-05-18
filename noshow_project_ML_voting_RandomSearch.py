@@ -148,7 +148,6 @@ model.fit(x_train, y_train)
 
 y_voting_predict = model.predict(x_test)
 voting_score = accuracy_score(y_test, y_voting_predict)
-print('voting result : ', voting_score)
 
 classifiers = [cat, xgb, lgbm]
 for model in classifiers:
@@ -157,3 +156,5 @@ for model in classifiers:
     score = accuracy_score(y_test, y_predict)
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
+
+print('voting result : ', voting_score)

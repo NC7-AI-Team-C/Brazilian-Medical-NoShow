@@ -98,11 +98,27 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 model = RandomForestClassifier()
 
-#2. 훈련
+#3. 훈련
+
+##earlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='min',
+                              verbose=1, restore_best_weights=True ) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
+
+# Model Check point
+mcp = ModelCheckpoint(
+    monitor='val_loss',
+    mode='auto',
+    verbose=1,
+    save_best_only=True,
+    filepath='./medical_noshow_MPJ/nmedical_noshow_test21.hdf5'
+)
+
 import time
 start_time = time.time()
 model.fit(x_train, y_train)
 end_time = time.time() - start_time
+
 
 #4. 평가, 예측
 
@@ -126,8 +142,22 @@ print('cv pred acc : ', acc)
 print("avg acc: ",np.mean(acc))
 print("acg std: ",np.std(acc))
 
+# 걸린 시간 :  3.8433783054351807 초
+# acc :  0.9449149475208107
+# cv pred :  [0 0 1 ... 0 0 1]
+# Classification Report : 
+#               precision    recall  f1-score   support
 
+#            0       0.97      0.96      0.96     22125
+#            1       0.85      0.87      0.86      5505
 
+#     accuracy                           0.94     27630
+#    macro avg       0.91      0.91      0.91     27630
+# weighted avg       0.94      0.94      0.94     27630
+
+# cv pred acc :  0.9435758233803836
+# avg acc:  0.9435758233803836
+# acg std:  0.0
 
 
 

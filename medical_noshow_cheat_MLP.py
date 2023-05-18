@@ -96,8 +96,6 @@ X = scaler.fit_transform(X)
 
 ##### 전처리 완료 #####
 
-
-
 ##### 훈련 구성 시작 #####
 x_train, x_test, y_train, y_test = train_test_split(
 X, y, test_size = 0.2, shuffle=True, random_state=42
@@ -123,8 +121,13 @@ model.compile(loss='binary_crossentropy',
 
 ##earlyStopping
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='min',
-                              verbose=1, restore_best_weights=True ) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
+earlyStopping = EarlyStopping(
+    monitor='val_loss', 
+    patience=50,
+    mode='min',
+    verbose=1,
+    restore_best_weights=True 
+) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
 
 # Model Check point
 mcp = ModelCheckpoint(
@@ -135,12 +138,15 @@ mcp = ModelCheckpoint(
     filepath='./mcp/noshow_cheat01.hdf5'
 )
 
-
 start_time = time.time()
-model.fit(x_train, y_train, epochs=500, batch_size=32, 
-          validation_split=0.2, 
-          callbacks=[earlyStopping, mcp],
-          verbose=1)
+
+model.fit(
+    x_train, y_train, epochs=500, batch_size=32, 
+    validation_split=0.2, 
+    callbacks=[earlyStopping, mcp],
+    verbose=1
+)
+
 end_time = time.time() - start_time
 
 loss, acc = model.evaluate(x_test, y_test)
@@ -149,6 +155,7 @@ model.summary()
 print('loss : ', loss)
 print('acc : ', acc)
 print('소요시간 : ', end_time)
+
 
 # Model: "sequential"
 # _________________________________________________________________

@@ -23,9 +23,8 @@ df = pd.read_csv(path)
 # print(medical_noshow.columns)
 # print(medical_noshow.head(10))
 
-print('Count of rows', str(df.shape[0]))
-print('Count of Columns', str(df.shape[1]))
-# 데이터프레임의 크기와 칼럼의 수를 출력
+print('df.shape', df.shape)
+# 데이터프레임의 크기와 칼럼의 수를 확인
 
 df = df.fillna(np.nan)  # 결측값 nan으로 채우기
 

@@ -144,37 +144,20 @@ print('모델 스코어 : ', model.score(x_test, y_test))
 print('걸린 시간 : ', end_time, '초')
 print('XGBoost -> GridSearchCV')
 
-##1. 
-# 최적의 파라미터 :  {'min_samples_leaf': 5, 'n_estimators': 100}
-# 최적의 매개변수 :  RandomForestClassifier(min_samples_leaf=5)
-# 베스트 스코어 :  0.9583333333333334
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  6.060913324356079 초
-
-##2. 그리드서치 다 넣었을 때 값
-# 최적의 파라미터 :  {'min_samples_leaf': 3, 'n_estimators': 100}
-# 최적의 매개변수 :  RandomForestClassifier(min_samples_leaf=3)
-# 베스트 스코어 :  0.975
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  10.51404595375061 초
-
-##3.
-# 최적의 파라미터 :  {'max_depth': 6, 'min_samples_split': 10}
-# 최적의 매개변수 :  RandomForestClassifier(max_depth=6, min_samples_split=10)
-# 베스트 스코어 :  0.9666666666666668
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  16.38246512413025 초
-
-# #4. 출력(평가, 예측)
-
-# result = model.score(x_test, y_test)
-# print('acc : ', result)
-
-# score = cross_val_score(model, x_train, y_train, cv=kfold)   # cv='cross validation'
-# print('cv acc : ', score)
-
-# y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
-# print('cv pred : ', y_predict)
-
-# acc = accuracy_score(y_test, y_predict)
-# print('cv pred acc : ', acc)
+# Fitting 5 folds for each of 6912 candidates, totalling 34560 fits
+# 최적의 파라미터 :  {'colsample_bylevel': 0.1, 'colsample_bynode': 0.1, 'colsample_bytree': 0.2, 'gamma': 2, 'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 0.01, 'n_estimators': 200, 'reg_alpha': 0.1, 'reg_lambda': 0.1, 'subsample': 0.2}
+# 최적의 매개변수 :  XGBClassifier(base_score=None, booster=None, callbacks=None,
+#               colsample_bylevel=0.1, colsample_bynode=0.1, colsample_bytree=0.2,
+#               early_stopping_rounds=None, enable_categorical=False,
+#               eval_metric=None, feature_types=None, gamma=2, gpu_id=None,
+#               grow_policy=None, importance_type=None,
+#               interaction_constraints=None, learning_rate=0.2, max_bin=None,
+#               max_cat_threshold=None, max_cat_to_onehot=None,
+#               max_delta_step=None, max_depth=3, max_leaves=None,
+#               min_child_weight=0.01, missing=nan, monotone_constraints=None,
+#               n_estimators=200, n_jobs=None, num_parallel_tree=None,
+#               predictor=None, random_state=None, ...)
+# 베스트 스코어 :  0.9728326641407001
+# 모델 스코어 :  0.9712269272529859
+# 걸린 시간 :  3320.203783750534 초
+# XGBoost -> GridSearchCV

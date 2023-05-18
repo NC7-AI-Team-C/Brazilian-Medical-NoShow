@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
+import warnings
 
 from sklearn.svm import SVC, LinearSVC
 from sklearn.ensemble import RandomForestRegressor
@@ -15,19 +16,6 @@ from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
 
 # Data preprocessing #
-
-import numpy as np
-import pandas as pd
-import time
-import warnings
-
-from keras.models import Sequential
-from keras.layers import Dense
-
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
-from sklearn.covariance import EllipticEnvelope
-from sklearn.preprocessing import LabelEncoder
 
 warnings.filterwarnings('ignore')
 

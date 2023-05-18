@@ -115,7 +115,7 @@ x_train, x_test, y_train, y_test = train_test_split(
     x, y, test_size=0.2, random_state=77, shuffle=True
 )
 
-def objectivexgb(trial: Trial, x_train, y_train, x_test):
+def objectiveXGB(trial: Trial, x_train, y_train, x_test):
     param = {
         'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
         'max_depth' : trial.suggest_int('max_depth', 8, 16),

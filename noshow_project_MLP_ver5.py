@@ -114,10 +114,11 @@ print(x_test.shape, y_test.shape)
 # ver 4 기준 입력층:linear, 은닉층:relu *2 에서 최상
 # ver 5 에서는 노드 수와 Dropout 추가해서 최적화 해볼 것
 model = Sequential()
-model.add(Dense(32, input_dim=16, activation='linear'))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(16, input_dim=16, activation='linear'))
 model.add(Dropout(0.2))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) 
 
 # 컴파일, 훈련
@@ -127,7 +128,7 @@ model.compile(loss='binary_crossentropy',
 
 ##earlyStopping
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='min',
+earlyStopping = EarlyStopping(monitor='val_loss', patience=32, mode='min',
                               verbose=1, restore_best_weights=True ) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
 
 # Model Check point
@@ -136,7 +137,7 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32_node128_dropout20_2.hdf5'
+    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32_node64_dropout20_3.hdf5'
     ######################################
     # 훈련전에 mcp파일 명 변경 잊지 말기!! #
     ######################################
@@ -152,7 +153,7 @@ end_time = time.time() - start_time
 
 loss, acc = model.evaluate(x_test, y_test)
 
-# model.summary()
+model.summary()
 print('소요시간 : ', end_time)
 print('batch_size : ', batch_size)
 print('loss : ', loss)
@@ -288,3 +289,65 @@ print('acc : ', acc)
 # batch_size :  32
 # loss :  0.05189896374940872
 # acc :  0.9728555679321289
+
+# model = Sequential()
+# model.add(Dense(32, input_dim=16, activation='linear'))
+# model.add(Dense(128, activation='relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(128, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) 
+# Epoch 00085: val_loss did not improve from 0.05410
+# 2211/2211 [==============================] - 9s 4ms/step - loss: 0.0514 - accuracy: 0.9731 - val_loss: 0.0562 - val_accuracy: 0.9722
+# Epoch 00085: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0516 - accuracy: 0.9727
+# 소요시간 :  784.7384386062622
+# batch_size :  32
+# loss :  0.05160897597670555
+# acc :  0.9726746082305908
+
+# model = Sequential()
+# model.add(Dense(64, input_dim=16, activation='linear'))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) 
+# Epoch 00107: val_loss did not improve from 0.05329
+# 2211/2211 [==============================] - 9s 4ms/step - loss: 0.0519 - accuracy: 0.9728 - val_loss: 0.0541 - val_accuracy: 0.9718
+# Epoch 00107: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0520 - accuracy: 0.9730
+# 소요시간 :  995.503630399704
+# batch_size :  32
+# loss :  0.05195314437150955
+# acc :  0.9729912877082825
+
+# model = Sequential()
+# model.add(Dense(64, input_dim=16, activation='linear'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) 
+# Epoch 00076: val_loss did not improve from 0.05301
+# 2211/2211 [==============================] - 9s 4ms/step - loss: 0.0525 - accuracy: 0.9721 - val_loss: 0.0543 - val_accuracy: 0.9727
+# Epoch 00076: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0518 - accuracy: 0.9730
+# 소요시간 :  714.9711000919342
+# batch_size :  32
+# loss :  0.05183543637394905
+# acc :  0.9729912877082825
+
+# model = Sequential()
+# model.add(Dense(16, input_dim=16, activation='linear'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) 
+# Epoch 00157: val_loss did not improve from 0.05229
+# 2211/2211 [==============================] - 10s 4ms/step - loss: 0.0531 - accuracy: 0.9715 - val_loss: 0.0530 - val_accuracy: 0.9723
+# Epoch 00157: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0511 - accuracy: 0.9736
+# 소요시간 :  1574.3082158565521
+# batch_size :  32
+# loss :  0.05109154060482979
+# acc :  0.9736247062683105

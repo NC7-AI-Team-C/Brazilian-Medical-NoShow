@@ -135,7 +135,7 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./medical_noshow/mcp/noshow_ver4_mcp02_node64.hdf5'
+    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32.hdf5'
     ######################################
     # 훈련전에 mcp파일 명 변경 잊지 말기!! #
     ######################################

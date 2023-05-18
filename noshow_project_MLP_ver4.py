@@ -117,7 +117,7 @@ x, y, test_size = 0.2, shuffle=True, random_state=42
 ## 2-2. create model ##
 
 model = Sequential()
-model.add(Dense(16, input_dim=16, activation='sigmoid'))
+model.add(Dense(16, input_dim=16, activation='linear'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) 
@@ -138,14 +138,15 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./medical_noshow/mcp/noshow_ver4_mcp02_node64.hdf5'
+    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32.hdf5'
     ######################################
     # 훈련전에 mcp파일 명 변경 잊지 말기!! #
     ######################################
 )
 
+batch_size=32
 start_time = time.time()
-model.fit(x_train, y_train, epochs=500, batch_size=64, 
+model.fit(x_train, y_train, epochs=500, batch_size=batch_size, 
           validation_split=0.2, 
           callbacks=[earlyStopping, mcp],
           verbose=1)
@@ -154,6 +155,7 @@ end_time = time.time() - start_time
 loss, acc = model.evaluate(x_test, y_test)
 
 model.summary()
+print('batch_size : ', batch_size)
 print('loss : ', loss)
 print('acc : ', acc)
 print('소요시간 : ', end_time)
@@ -368,3 +370,51 @@ print('소요시간 : ', end_time)
 # loss :  0.05166608840227127
 # acc :  0.9724484086036682 # 은닉층 2개 입력층에 relu 적용 #은닉층 3개와 같은 결과값
 # 소요시간 :  299.9599003791809
+
+# Epoch 00158: val_loss did not improve from 0.05313
+# 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0509 - accuracy: 0.9730 - val_loss: 0.0547 - val_accuracy: 0.9729
+# Epoch 00158: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0518 - accuracy: 0.9722
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 1,905
+# Trainable params: 1,905
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.051755670458078384
+# acc :  0.9721769690513611
+# 소요시간 :  739.606773853302
+
+# Epoch 00158: val_loss did not improve from 0.05313
+# 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0509 - accuracy: 0.9730 - val_loss: 0.0547 - val_accuracy: 0.9729
+# Epoch 00158: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0518 - accuracy: 0.9722
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 1,905
+# Trainable params: 1,905
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.051755670458078384
+# acc :  0.9721769690513611 # 입력층에 시그모이드 적용 -> 결과 하락 (디폴트는 linear)
+# 소요시간 :  739.606773853302

@@ -1,12 +1,15 @@
-#!/usr/bin/env python
 # coding: utf-8
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import r2_score
 import time
+
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
 
 from sklearn.covariance import EllipticEnvelope
 from sklearn.preprocessing import LabelEncoder
@@ -23,12 +26,11 @@ df = pd.read_csv(path)
 # print(medical_noshow.columns)
 # print(medical_noshow.head(10))
 
-print('df.shape', df.shape)
+print('Count of rows', str(df.shape[0]))
+print('Count of Columns', str(df.shape[1]))
 # 데이터프레임의 크기와 칼럼의 수를 출력
 
 df = df.fillna(np.nan)  # 결측값 nan으로 채우기
-df = df.dropna(axis = 0)    # nan값을 가진 행 드랍
-df.info()   # 결측치 없는것 확인
 
 for column_name in df.columns:
     print(column_name+":",len(df[column_name].unique()))
@@ -53,7 +55,7 @@ ob_col = list(df.dtypes[df.dtypes=='object'].index)
 for col in ob_col:
     df[col] = LabelEncoder().fit_transform(df[col].values)
 # object인 데이터를 숫자형 데이터로 변환
-df.info() # 데이터 타입 변경 여부 확인
+df.info()
 print(df['No-show'][0:10])
 # [ no : 0, yes : 1 ]으로 정수화 되었음을 확인
 # 각 컬럼의 데이터 타입 확인
@@ -72,6 +74,7 @@ df['PreviousNoShow'] = df['PreviousNoShow'].fillna(0)
 # 'PreviousNoShow' 칼럼의 NaN 값을 0으로 채운다. 
 # 즉, 첫 예약자는 이전에 noShow 안한것으로 간주
 
+# Number of Appointments Missed by Patient
 df['Num_App_Missed'] = df.groupby('PatientId')['No-show'].cumsum()
 # 'PatientId'가 같은 데이터끼리 그룹으로 묶어서 환자별로 고려,
 # 'Num_App_Missed' 각 환자별 누적 No-show 수를 계산한 칼럼을 생성
@@ -81,24 +84,78 @@ df['Num_App_Missed'] = df.groupby('PatientId')['No-show'].cumsum()
 df['Handcap'] = pd.Categorical(df['Handcap'])
 #  원 핫 인코딩 개념을 이용해서 핸드캡을 범주형 데이터로 변환
 Handicap = pd.get_dummies(df['Handcap'], prefix = 'Handicap')
-# 핸드캡 칼럼을 핸디캡 더미 변수로 변환(변수명에 i만 추가됨에 구별 주의)
+# 핸드캡 칼럼을 핸디캡 더미 변수로 변환(변수명에 i만 추가됨 주의)
 # prefix='Handicap'는 생성된 더미 변수의 이름에 'Handicap' 접두사를 붙이도록 지정
 df = pd.concat([df, Handicap], axis=1)
 # 데이터 프레임에 핸디캡 변수를 추가, 데이터 프레임을 열방향으로 병합
 df.drop(['Handcap','ScheduledDay','AppointmentDay', 'AppointmentID','PatientId','Neighbourhood'], axis=1, inplace=True)
 # 불필요한 칼럼 삭제, inplace=True 파라미터를 통해 원본 데이터프레임 수정
-print(df.describe())    # 이상치 존재 여부 확인
+print(df.describe())
 
 df = df[(df.Age >= 0) & (df.Age <= 100)]
+df.info()
 # 'Age' 열의 값이 0 이상 100 이하인 행만 선택 # 이외의 값은 이상치로 판정
-df.info()   # 마지막으로 nan값 존재여부 및 데이터 타입 확인
 
-y = df['No-show']
 x = df.drop(['No-show'], axis=1)
-
+y = df['No-show']
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
+##### 전처리 완료 #####
 
-##### Complete Data Preprocessing #####
+######### voting ############
+
+x_train, x_test, y_train, y_test = train_test_split(
+    x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True
+)
+
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
+n_splits = 5
+random_state = 42
+kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+xgb = XGBClassifier(
+    subsample = 0.9, reg_lambda= 0.5, reg_alpha= 0.01, n_estimators= 500, 
+    min_child_weight= 9, max_depth= 12, learning_rate= 0.01, gamma= 0.05, 
+    colsample_bytree= 0.9, colsample_bynode= 0.9, colsample_bylevel= 0.3
+) # optuna로 산출한 best_parameter 적용
+
+lgbm = LGBMClassifier(
+    subsample= 0.3, reg_lambda= 1.2, 
+    reg_alpha= 0.05, num_leaves= 24, n_estimators= 700, min_data_in_leaf= 1, 
+    min_child_samples= 90, max_depth= 3, learning_rate= 0.01, feature_fraction= 0.85, 
+    colsample_bytree= 1.2
+) # optuna로 산출한 best_parameter 적용
+
+cat = CatBoostClassifier(
+    subsample= 0.5, random_strength= 2, n_estimators= 500, learning_rate= 0.01, 
+    l2_leaf_reg= 9, depth= 9, colsample_bylevel= 0.9, border_count= 10, 
+    bagging_temperature= 1
+) # optuna로 산출한 best_parameter 적용
+
+model = VotingClassifier(
+    estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
+    voting='hard',
+    n_jobs=-1,
+    verbose=0
+)
+
+model.fit(x_train, y_train)
+
+y_voting_predict = model.predict(x_test)
+voting_score = accuracy_score(y_test, y_voting_predict)
+
+classifiers = [cat, xgb, lgbm]
+for model in classifiers:
+    model.fit(x_train, y_train)
+    y_predict = model.predict(x_test)
+    score = accuracy_score(y_test, y_predict)
+    class_name = model.__class__.__name__
+    print(class_name, "'s score : ", score)
+
+print('voting result : ', voting_score)
+print('RandomSearch -> voting')
+

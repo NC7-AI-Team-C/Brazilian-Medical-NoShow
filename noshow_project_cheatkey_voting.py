@@ -81,19 +81,35 @@ from sklearn.ensemble import VotingClassifier
 
 
 #####################kfold#########################
-n_splits = 21
-random_state = 62
+n_splits = 5
+random_state = 42
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
 ############################################모델 
-xgb = XGBClassifier()
-lgbm = LGBMClassifier()
-cat = CatBoostClassifier()
+xgb = XGBClassifier(
+    n_estimators = 3502,
+    learning_rate = 0.8716436036914981,
+    random_state = 296
+)
+lgbm = LGBMClassifier(
+    n_estimators = 3762,
+    learning_rate = 0.34639249238719827,
+    random_state = 1486
+)
+cat = CatBoostClassifier(
+    n_estimators = 3964,
+    depth = 16,
+    fold_permutation_block = 94,
+    learning_rate = 0.6568663313453064,
+    od_pval = 0.05248246675064383,
+    l2_leaf_reg = 1.336973598095982,
+    random_state = 413
+)
 
 model = VotingClassifier(
     estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
     voting='hard',
-    n_jobs=-1,
+    n_jobs=1,
     verbose=0
 )
 

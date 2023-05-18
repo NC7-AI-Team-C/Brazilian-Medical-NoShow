@@ -23,8 +23,8 @@ warnings.filterwarnings('ignore')
 
 # Data preprocessing #
 
-path = '../AI_study/'
-df = pd.read_csv(path + 'medical_noshow.csv')
+path = './medical_noshow.csv'
+df = pd.read_csv(path)
 # CSV 파일을 읽어와서 DataFrame으로 저장
 
 # print(medical_noshow.columns)

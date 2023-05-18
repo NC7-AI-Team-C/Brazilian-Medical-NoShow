@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-import optuna
 import warnings
 
 from sklearn.svm import SVC, LinearSVC
@@ -11,11 +10,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
+from sklearn.feature_selection import SelectFromModel
 from sklearn.covariance import EllipticEnvelope
-from sklearn.metrics import mean_absolute_error
-
-from optuna import Trial, visualization
-from optuna.samplers import TPESampler
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -23,7 +19,7 @@ from catboost import CatBoostClassifier
 
 warnings.filterwarnings('ignore')
 
-# Data preprocessing #
+# 1. Data preprocessing #
 
 path = 'C:/Users/bitcamp/Desktop/새 폴더/'
 df = pd.read_csv(path + 'medical_noshow.csv')
@@ -109,40 +105,74 @@ scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
 
-##### Complete Data Preprocessing #####
+##### 전처리 완료 #####
+
+# 2. Modeling #
+
+## 2-1. Dividing into training and test data ##
 
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, test_size=0.2, random_state=77, shuffle=True
+    x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True
 )
 
-def objectiveXGB(trial: Trial, x_train, y_train, x_test):
-    param = {
-       'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
-        'depth' : trial.suggest_int('depth', 8, 16),
-        'fold_permutation_block' : trial.suggest_int('fold_permutation_block', 1, 256),
-        'learning_rate' : trial.suggest_float('learning_rate', 0, 1),
-        'od_pval' : trial.suggest_float('od_pval', 0, 1),
-        'l2_leaf_reg' : trial.suggest_float('l2_leaf_reg', 0, 4),
-        'random_state' :trial.suggest_int('random_state', 1, 2000)
-    }
-    # 학습 모델 생성
-    model = XGBClassifier(**param)
-    XGB_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
-    # 모델 성능 확인
-    score = accuracy_score(XGB_model.predict(x_test), y_test)
-    return score
+## 2-2. scaling data & cross validating set ## 
 
-# MAE가 최소가 되는 방향으로 학습을 진행
-# TPESampler : Sampler using TPE (Tree-structured Parzen Estimator) algorithm.
-study = optuna.create_study(direction='maximize', sampler=TPESampler())
+n_splits = 5
+random_state = 42
+kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
-# n_trials 지정해주지 않으면, 무한 반복
-study.optimize(lambda trial : objectiveXGB(trial, x, y, x_test), n_trials = 5)
-print('Best trial : score {}, /nparams {}'.format(study.best_trial.value, 
-                                                  study.best_trial.params))
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
 
-# 하이퍼파라미터별 중요도를 확인할 수 있는 그래프
-print(optuna.visualization.plot_param_importances(study))
-# 하이퍼파라미터 최적화 과정을 확인
-optuna.visualization.plot_optimization_history(study)
-plt.show()
+## 2-3. create model ##
+
+model = XGBClassifier(
+    n_estimators= 3616, max_depth = 11, random_state = 1682
+)
+
+## 2-4. train model ##
+
+start_time = time.time()
+
+model.fit(
+    x_train, y_train, early_stopping_rounds=20,
+    eval_set=[(x_train, y_train), (x_test, y_test)],
+    eval_metric='error'
+    # regression model : rmse, mae, rmsle...
+    # binary classification : error, auc, logloss...
+    # multiclass classification : merror, mlogloss...
+)
+
+result = model.score(x_test, y_test)
+score = cross_val_score(model, x_train, y_train, cv=kfold)
+y_predict = cross_val_predict(model, x_test, y_test, cv=kfold )
+acc = accuracy_score(y_test, y_predict)
+
+end_time = time.time() - start_time
+
+print('acc : ', acc)
+print('소요시간 : ', end_time)
+
+# SelectFromModel
+thresholds = model.feature_importances_
+
+for thresh in thresholds:
+    selection = SelectFromModel(model, threshold=thresh, prefit=True)
+    select_x_train = selection.transform(x_train)
+    select_x_test = selection.transform(x_test)
+    print(select_x_train.shape, select_x_test.shape)
+
+    selection_model = XGBClassifier()
+    selection_model.fit(select_x_train, y_train)
+    y_predict = selection_model.predict(select_x_test)
+    score = accuracy_score(y_test, y_predict)
+    print("Thresh=%.3f, n=%d, acc:%.2f%%" % (thresh, select_x_train.shape[1], score*100))
+                                             
+
+
+# acc :  0.9686482084690554
+# 소요시간 :  368.8738839626312
+# (66311, 12) (22104, 12)
+                                       

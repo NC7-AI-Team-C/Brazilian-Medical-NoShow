@@ -25,8 +25,8 @@ warnings.filterwarnings('ignore')
 
 # Data preprocessing #
 
-path = './medical_noshow.csv'
-df = pd.read_csv(path)
+path = 'C:/Users/bitcamp/Desktop/새 폴더/'
+df = pd.read_csv(path + 'medical_noshow.csv')
 # CSV 파일을 읽어와서 DataFrame으로 저장
 
 # print(medical_noshow.columns)

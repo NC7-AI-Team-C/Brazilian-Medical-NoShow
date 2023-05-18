@@ -1,29 +1,27 @@
+#!/usr/bin/env python
+# coding: utf-8
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+from keras.models import Sequential
+from keras.layers import Dense
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
 import time
-import optuna
-import warnings
 
-from sklearn.svm import SVC, LinearSVC
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 from sklearn.covariance import EllipticEnvelope
-from sklearn.metrics import mean_absolute_error
+from sklearn.preprocessing import LabelEncoder
 
+import optuna
 from optuna import Trial, visualization
 from optuna.samplers import TPESampler
-
-from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 
+import warnings
 warnings.filterwarnings('ignore')
 
-# Data preprocessing #
+# 1. Data preprocessing #
 
 path = 'C:/Users/bitcamp/Desktop/새 폴더/'
 df = pd.read_csv(path + 'medical_noshow.csv')
@@ -109,40 +107,47 @@ scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
 
-##### Complete Data Preprocessing #####
-
+##### 전처리 완료 #####
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, test_size=0.2, random_state=77, shuffle=True
+    x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True
 )
 
-def objectiveXGB(trial: Trial, x_train, y_train, x_test):
+
+
+n_splits = 5
+random_state = 42
+kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+x = scaler.fit_transform(x)
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+
+
+def objectivexgb(trial: Trial, x_train, y_train, x_test):
     param = {
-       'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
-        'depth' : trial.suggest_int('depth', 8, 16),
-        'fold_permutation_block' : trial.suggest_int('fold_permutation_block', 1, 256),
+        'n_estimators' : trial.suggest_int('n_estimators', 500, 4000),
         'learning_rate' : trial.suggest_float('learning_rate', 0, 1),
-        'od_pval' : trial.suggest_float('od_pval', 0, 1),
-        'l2_leaf_reg' : trial.suggest_float('l2_leaf_reg', 0, 4),
         'random_state' :trial.suggest_int('random_state', 1, 2000)
     }
     # 학습 모델 생성
-    model = XGBClassifier(**param)
-    XGB_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
+    model = LGBMClassifier(**param)
+    random_model = model.fit(x_train, y_train) # 학습 진행
     # 모델 성능 확인
-    score = accuracy_score(XGB_model.predict(x_test), y_test)
+    score = accuracy_score(random_model.predict(x_test), y_test)
     return score
 
-# MAE가 최소가 되는 방향으로 학습을 진행
 # TPESampler : Sampler using TPE (Tree-structured Parzen Estimator) algorithm.
 study = optuna.create_study(direction='maximize', sampler=TPESampler())
 
-# n_trials 지정해주지 않으면, 무한 반복
-study.optimize(lambda trial : objectiveXGB(trial, x, y, x_test), n_trials = 5)
+study.optimize(lambda trial : objectivexgb(trial, x, y, x_test), n_trials = 5)
 print('Best trial : score {}, /nparams {}'.format(study.best_trial.value, 
                                                   study.best_trial.params))
 
-# 하이퍼파라미터별 중요도를 확인할 수 있는 그래프
+
 print(optuna.visualization.plot_param_importances(study))
-# 하이퍼파라미터 최적화 과정을 확인
 optuna.visualization.plot_optimization_history(study)
 plt.show()
+
+print('optuna_lgbm param')

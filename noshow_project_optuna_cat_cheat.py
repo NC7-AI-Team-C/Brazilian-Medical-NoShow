@@ -25,8 +25,8 @@ warnings.filterwarnings('ignore')
 
 # Data preprocessing #
 
-path = './medical_noshow.csv'
-df = pd.read_csv(path)
+path = 'C:/Users/bitcamp/Desktop/새 폴더/'
+df = pd.read_csv(path + 'medical_noshow.csv')
 # CSV 파일을 읽어와서 DataFrame으로 저장
 
 # print(medical_noshow.columns)
@@ -146,3 +146,4 @@ print(optuna.visualization.plot_param_importances(study))
 # 하이퍼파라미터 최적화 과정을 확인
 optuna.visualization.plot_optimization_history(study)
 plt.show()
+

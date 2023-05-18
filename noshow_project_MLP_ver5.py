@@ -137,7 +137,7 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32_node64_dropout20_3.hdf5'
+    filepath='./mcp/noshow_ver5_layer2_bat32_input16_hidden64_dropout20.hdf5'
     ######################################
     # 훈련전에 mcp파일 명 변경 잊지 말기!! #
     ######################################
@@ -158,6 +158,7 @@ print('소요시간 : ', end_time)
 print('batch_size : ', batch_size)
 print('loss : ', loss)
 print('acc : ', acc)
+print('noShow MLP')
 
 # y_pred = model.predict(x_test)
 # y_test['noshowPred'] = y_pred

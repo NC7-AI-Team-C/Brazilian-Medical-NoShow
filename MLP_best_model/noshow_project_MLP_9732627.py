@@ -1,15 +1,12 @@
+#!/usr/bin/env python
 # coding: utf-8
 import numpy as np
 import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from sklearn.model_selection import train_test_split, StratifiedKFold
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 import time
-
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
 
 from sklearn.covariance import EllipticEnvelope
 from sklearn.preprocessing import LabelEncoder
@@ -104,58 +101,81 @@ x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
 ##### 전처리 완료 #####
 
-######### voting ############
 
+
+##### 훈련 구성 시작 #####
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True
+x, y, test_size = 0.2, shuffle=True, random_state=42
+)
+print(x_train.shape, y_train.shape)
+print(x_test.shape, y_test.shape)
+
+##### 모델 구성 ##### 
+# ver 4 기준 입력층:linear, 은닉층:relu *2 에서 최상
+# ver 5 기준 16/0.2/64/0.2/64/1 이 최상
+model = Sequential()
+model.add(Dense(16, input_dim=16, activation='linear'))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(128, activation='relu'))
+model.add(Dense(1, activation='sigmoid')) 
+
+# 컴파일, 훈련
+model.compile(loss='binary_crossentropy', 
+              optimizer='adam', 
+              metrics=['accuracy'])
+
+##earlyStopping
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+earlyStopping = EarlyStopping(monitor='val_loss', patience=32, mode='min',
+                              verbose=1, restore_best_weights=True ) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
+
+# Model Check point
+mcp = ModelCheckpoint(
+    monitor='val_loss',
+    mode='auto',
+    verbose=1,
+    save_best_only=True,
+    filepath='./mcp/noshow_ver5_layer2_bat32_16_128_64_1.hdf5'
+    ######################################
+    # 훈련전에 mcp파일 명 변경 잊지 말기!! #
+    ######################################
 )
 
-x_train = scaler.fit_transform(x_train)
-x_test = scaler.transform(x_test)
+batch_size=32
+start_time = time.time()
+model.fit(x_train, y_train, epochs=500, batch_size=batch_size, 
+          validation_split=0.2, 
+          callbacks=[earlyStopping, mcp],
+          verbose=1)
+end_time = time.time() - start_time
 
-n_splits = 5
-random_state = 42
-kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+loss, acc = model.evaluate(x_test, y_test)
 
-xgb = XGBClassifier(
-    subsample = 0.9, reg_lambda= 0.5, reg_alpha= 0.01, n_estimators= 500, 
-    min_child_weight= 9, max_depth= 12, learning_rate= 0.01, gamma= 0.05, 
-    colsample_bytree= 0.9, colsample_bynode= 0.9, colsample_bylevel= 0.3
-) # optuna로 산출한 best_parameter 적용
+model.summary()
+print('소요시간 : ', end_time)
+print('batch_size : ', batch_size)
+print('loss : ', loss)
+print('acc : ', acc)
+print('noShow MLP')
 
-lgbm = LGBMClassifier(
-    subsample= 0.3, reg_lambda= 1.2, 
-    reg_alpha= 0.05, num_leaves= 24, n_estimators= 700, min_data_in_leaf= 1, 
-    min_child_samples= 90, max_depth= 3, learning_rate= 0.01, feature_fraction= 0.85, 
-    colsample_bytree= 1.2
-) # optuna로 산출한 best_parameter 적용
+# y_pred = model.predict(x_test)
+# y_test['noshowPred'] = y_pred
+# print(y_test.head())
 
-cat = CatBoostClassifier(
-    subsample= 0.5, random_strength= 2, n_estimators= 500, learning_rate= 0.01, 
-    l2_leaf_reg= 9, depth= 9, colsample_bylevel= 0.9, border_count= 10, 
-    bagging_temperature= 1
-) # optuna로 산출한 best_parameter 적용
-
-model = VotingClassifier(
-    estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
-    voting='hard',
-    n_jobs=-1,
-    verbose=0
-)
-
-model.fit(x_train, y_train)
-
-y_voting_predict = model.predict(x_test)
-voting_score = accuracy_score(y_test, y_voting_predict)
-
-classifiers = [cat, xgb, lgbm]
-for model in classifiers:
-    model.fit(x_train, y_train)
-    y_predict = model.predict(x_test)
-    score = accuracy_score(y_test, y_predict)
-    class_name = model.__class__.__name__
-    print(class_name, "'s score : ", score)
-
-print('voting result : ', voting_score)
-print('RandomSearch -> voting')
-
+# model = Sequential()
+# model.add(Dense(16, input_dim=16, activation='linear'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dropout(0.2))
+# model.add(Dense(64, activation='relu'))
+# model.add(Dense(1, activation='sigmoid')) 
+# Epoch 00157: val_loss did not improve from 0.05229
+# 2211/2211 [==============================] - 10s 4ms/step - loss: 0.0531 - accuracy: 0.9715 - val_loss: 0.0530 - val_accuracy: 0.9723
+# Epoch 00157: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0511 - accuracy: 0.9736
+# 소요시간 :  1574.3082158565521
+# batch_size :  32
+# loss :  0.05109154060482979
+# acc :  0.9736247062683105

@@ -99,6 +99,7 @@ from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
+
 ##### 전처리 완료 #####
 
 
@@ -115,9 +116,9 @@ print(x_test.shape, y_test.shape)
 # ver 5 에서는 노드 수와 Dropout 추가해서 최적화 해볼 것
 model = Sequential()
 model.add(Dense(32, input_dim=16, activation='linear'))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dropout(0.2))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) 
 
 # 컴파일, 훈련
@@ -136,7 +137,7 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32_node128_dropout20_2.hdf5'
+    filepath='./medical_noshow/mcp/noshow_ver5_layer2_bat32_node64_dropout20.hdf5'
     ######################################
     # 훈련전에 mcp파일 명 변경 잊지 말기!! #
     ######################################
@@ -157,10 +158,9 @@ print('소요시간 : ', end_time)
 print('batch_size : ', batch_size)
 print('loss : ', loss)
 print('acc : ', acc)
-
-# y_pred = model.predict(x_test)
-# y_test['noshowPred'] = y_pred
-# print(y_test.head())
+y_pred = model.predict(x_test)
+x_test['noShow_pred'] = model.predict(x_test)
+print(x_test.head())
 
 # Epoch 00071: val_loss did not improve from 0.05350
 # 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0503 - accuracy: 0.9734 - val_loss: 0.0551 - val_accuracy: 0.9721
@@ -273,18 +273,3 @@ print('acc : ', acc)
 # loss :  0.05150332674384117
 # acc :  0.9733985066413879
 # 소요시간 :  1411.1894390583038
-
-# model = Sequential()
-# model.add(Dense(64, input_dim=16, activation='linear'))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dropout(0.2))
-# model.add(Dense(128, activation='relu'))
-# model.add(Dense(1, activation='sigmoid')) 
-# Epoch 00096: val_loss did not improve from 0.05353
-# 2211/2211 [==============================] - 9s 4ms/step - loss: 0.0519 - accuracy: 0.9727 - val_loss: 0.0545 - val_accuracy: 0.9727
-# Epoch 00096: early stopping
-# 691/691 [==============================] - 2s 3ms/step - loss: 0.0519 - accuracy: 0.9729
-# 소요시간 :  900.7635307312012
-# batch_size :  32
-# loss :  0.05189896374940872
-# acc :  0.9728555679321289

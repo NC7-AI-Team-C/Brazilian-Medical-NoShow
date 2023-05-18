@@ -116,10 +116,10 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
 param = [
-    {'num_leaves' : [0.1, 0.2], 'min_data_in_leaf' : [100],
-     'feature_fraction' : [0.1, 0.2], 'n_estimators' : [100, 200],
-     'learning_rate' : [0.1, 0.2], 'reg_lambda' : [0.1, 0.01],
-     'reg_alpha' : [0.1, 0.01], 'max_depth ' : [2,3]}
+    {'num_leaves' : [1, 3, 5, 7, 9], 'min_data_in_leaf' : [100, 200, 300],
+     'feature_fraction' : [0, 0.1, 0.2], 'n_estimators' : [100, 200, 300],
+     'learning_rate' : [0, 0.1, 0.2], 'reg_lambda' : [0, 0.1, 0.01],
+     'reg_alpha' : [0, 0.1, 0.01], 'max_depth ' : [6, 8]}
         ]
 
 #2. 모델구성
@@ -142,37 +142,16 @@ print('모델 스코어 : ', model.score(x_test, y_test))
 print('걸린 시간 : ', end_time, '초')
 print('LightGBM -> GridSearchCV')
 
-##1. 
-# 최적의 파라미터 :  {'min_samples_leaf': 5, 'n_estimators': 100}
-# 최적의 매개변수 :  RandomForestClassifier(min_samples_leaf=5)
-# 베스트 스코어 :  0.9583333333333334
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  6.060913324356079 초
 
-##2. 그리드서치 다 넣었을 때 값
-# 최적의 파라미터 :  {'min_samples_leaf': 3, 'n_estimators': 100}
-# 최적의 매개변수 :  RandomForestClassifier(min_samples_leaf=3)
-# 베스트 스코어 :  0.975
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  10.51404595375061 초
-
-##3.
-# 최적의 파라미터 :  {'max_depth': 6, 'min_samples_split': 10}
-# 최적의 매개변수 :  RandomForestClassifier(max_depth=6, min_samples_split=10)
-# 베스트 스코어 :  0.9666666666666668
-# 모델 스코어 :  0.9666666666666667
-# 걸린 시간 :  16.38246512413025 초
-
-# #4. 출력(평가, 예측)
-
-# result = model.score(x_test, y_test)
-# print('acc : ', result)
-
-# score = cross_val_score(model, x_train, y_train, cv=kfold)   # cv='cross validation'
-# print('cv acc : ', score)
-
-# y_predict = cross_val_predict(model, x_test, y_test, cv=kfold)
-# print('cv pred : ', y_predict)
-
-# acc = accuracy_score(y_test, y_predict)
-# print('cv pred acc : ', acc)
+# Fitting 5 folds for each of 7290 candidates, totalling 36450 fits
+# [LightGBM] [Warning] max_depth is set=-1, max_depth= will be ignored. Current value: max_depth=-1
+# [LightGBM] [Warning] Unknown parameter: 6
+# [LightGBM] [Warning] feature_fraction is set=0.2, colsample_bytree=1.0 will be ignored. Current value: feature_fraction=0.2
+# [LightGBM] [Warning] min_data_in_leaf is set=200, min_child_samples=20 will be ignored. Current value: min_data_in_leaf=200
+# 최적의 파라미터 :  {'feature_fraction': 0.2, 'learning_rate': 0.1, 'max_depth ': 6, 'min_data_in_leaf': 200, 'n_estimators': 300, 'num_leaves': 7, 'reg_alpha': 0.1, 'reg_lambda': 0.01}
+# 최적의 매개변수 :  LGBMClassifier(feature_fraction=0.2, max_depth =6, min_data_in_leaf=200,
+#                n_estimators=300, num_leaves=7, reg_alpha=0.1, reg_lambda=0.01)
+# 베스트 스코어 :  0.9733303172538597
+# 모델 스코어 :  0.9712269272529859
+# 걸린 시간 :  775.3182270526886 초
+# LightGBM -> GridSearchCV

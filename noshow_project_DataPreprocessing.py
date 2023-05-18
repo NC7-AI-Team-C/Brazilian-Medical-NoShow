@@ -25,6 +25,7 @@ df = pd.read_csv(path)
 
 print('df.shape', df.shape)
 # 데이터프레임의 크기와 칼럼의 수를 출력
+
 df = df.fillna(np.nan)  # 결측값 nan으로 채우기
 df = df.dropna(axis = 0)    # nan값을 가진 행 드랍
 df.info()   # 결측치 없는것 확인
@@ -100,4 +101,4 @@ scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
 
-##### 전처리 완료 #####
+##### Complete Data Preprocessing #####

@@ -144,10 +144,7 @@ mcp = ModelCheckpoint(
     ######################################
 )
 
-<<<<<<< HEAD:medical_noshow/noshow_project_MLP_ver4.py
 batch_size=32
-=======
->>>>>>> 5b274416ac00897ceb4fe130b49bcbbc4a42edac:noshow_project_MLP_ver4.py
 start_time = time.time()
 model.fit(x_train, y_train, epochs=500, batch_size=batch_size, 
           validation_split=0.2, 

@@ -23,7 +23,7 @@ warnings.filterwarnings('ignore')
 
 # Data preprocessing #
 
-path = '../AI_study/'
+path = 'C:/Users/bitcamp/Desktop/새 폴더/'
 df = pd.read_csv(path + 'medical_noshow.csv')
 # CSV 파일을 읽어와서 DataFrame으로 저장
 
@@ -119,20 +119,26 @@ random_state = 42
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
 xgb = XGBClassifier(
-    n_estimators=3616,
-    max_depth=11,
-    random_state=1682
+    n_estimators=3062,
+    max_depth=14,
+    random_state=213
 ) # optuna로 산출한 best_parameter 적용
 
 lgbm = LGBMClassifier(
-    n_estimators=3636,
-    learning_rate=0.3880556792419577,
-    random_state=232
+    n_estimators=1878,
+    learning_rate=0.6004018741509568,
+    random_state=489
 ) # optuna로 산출한 best_parameter 적용
 
 cat = CatBoostClassifier(
-    
-) # optuna로 산출한 best_parameter 적용
+    n_estimators=3825,
+    depth=13,
+    fold_permutation_block=146,
+    learning_rate=0.3813980309031604,
+    od_pval=0.9595288664068502,
+    l2_leaf_reg=2.877641653494577,
+    random_state=1667
+)# optuna로 산출한 best_parameter 적용
 
 model = VotingClassifier(
     estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
@@ -154,3 +160,5 @@ for model in classifiers:
     score = accuracy_score(y_test, y_predict)
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
+    
+print('Optuna -> voting')    

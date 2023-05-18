@@ -79,9 +79,9 @@ df['Num_App_Missed'] = df.groupby('PatientId')['No-show'].cumsum()
 
 # print("handcap 종류 : ",df['Handcap'].unique())
 df['Handcap'] = pd.Categorical(df['Handcap'])
-# 핸드캡을 범주형 데이터로 변환
+#  원 핫 인코딩 개념을 이용해서 핸드캡을 범주형 데이터로 변환
 Handicap = pd.get_dummies(df['Handcap'], prefix = 'Handicap')
-# 핸드캡 칼럼을 핸디캡 더미 변수로 변환
+# 핸드캡 칼럼을 핸디캡 더미 변수로 변환(변수명에 i만 추가됨 주의)
 # prefix='Handicap'는 생성된 더미 변수의 이름에 'Handicap' 접두사를 붙이도록 지정
 df = pd.concat([df, Handicap], axis=1)
 # 데이터 프레임에 핸디캡 변수를 추가, 데이터 프레임을 열방향으로 병합
@@ -114,8 +114,7 @@ print(x_test.shape, y_test.shape)
 
 # 모델 구성
 model = Sequential()
-model.add(Dense(16, input_dim=16))
-model.add(Dense(32, activation='relu'))
+model.add(Dense(16, input_dim=16, activation='sigmoid'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(1, activation='sigmoid')) 
@@ -127,7 +126,7 @@ model.compile(loss='binary_crossentropy',
 
 ##earlyStopping
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-earlyStopping = EarlyStopping(monitor='val_loss', patience=50, mode='min',
+earlyStopping = EarlyStopping(monitor='val_loss', patience=25, mode='min',
                               verbose=1, restore_best_weights=True ) # restore_best_weights의 기본값은 false이므로 true로 반드시 변경
 
 # Model Check point
@@ -136,12 +135,15 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True,
-    filepath='./mcp/noshow_ver3_mcp01.hdf5'
+    filepath='./medical_noshow/mcp/noshow_ver4_mcp02_node64.hdf5'
+    ######################################
+    # 훈련전에 mcp파일 명 변경 잊지 말기!! #
+    ######################################
 )
 
 
 start_time = time.time()
-model.fit(x_train, y_train, epochs=500, batch_size=32, 
+model.fit(x_train, y_train, epochs=500, batch_size=64, 
           validation_split=0.2, 
           callbacks=[earlyStopping, mcp],
           verbose=1)
@@ -238,3 +240,129 @@ print('소요시간 : ', end_time)
 # loss :  0.08681493252515793
 # acc :  0.9618168473243713
 # 소요시간 :  2917.160630464554
+
+# 전처리 코드 수정판 -> acc 값 상승
+# Epoch 00080: val_loss did not improve from 0.05412
+# 2211/2211 [==============================] - 9s 4ms/step - loss: 0.0485 - accuracy: 0.9749 - val_loss: 0.0589 - val_accuracy: 0.9709
+# Epoch 00080: early stopping
+# 691/691 [==============================] - 2s 2ms/step - loss: 0.0523 - accuracy: 0.9724
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_4 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 2,961
+# Trainable params: 2,961
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.05232706665992737
+# acc :  0.9724484086036682
+# 소요시간 :  725.5225591659546
+
+###########################################################################
+# ver4
+# 레이어 갯수에 따라 결과 비교하기
+# Epoch 00106: val_loss did not improve from 0.05498
+# 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0505 - accuracy: 0.9733 - val_loss: 0.0553 - val_accuracy: 0.9720
+# Epoch 00106: early stopping
+# 691/691 [==============================] - 2s 2ms/step - loss: 0.0515 - accuracy: 0.9720
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 849
+# Trainable params: 849
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.05149100348353386
+# acc :  0.971996009349823  # 은닉층 1개
+# 소요시간 :  478.8084788322449
+
+# Epoch 00071: val_loss did not improve from 0.05350
+# 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0503 - accuracy: 0.9734 - val_loss: 0.0551 - val_accuracy: 0.9721
+# Epoch 00071: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0522 - accuracy: 0.9725
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272       
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 1,905
+# Trainable params: 1,905
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.052245061844587326
+# acc :  0.9724936485290527 # 은닉층 2개
+# 소요시간 :  345.04135298728943
+
+# Epoch 00062: val_loss did not improve from 0.05453
+# 1106/1106 [==============================] - 5s 4ms/step - loss: 0.0503 - accuracy: 0.9733 - val_loss: 0.0553 - val_accuracy: 0.9713
+# Epoch 00062: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0520 - accuracy: 0.9724
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_4 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 2,961
+# Trainable params: 2,961
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.052001629024744034
+# acc :  0.9724484086036682 # 은닉층 3개 # 2개에 비해 0.00005 하락 # 유의미한 차이는 아니라 노드 들려가며 비교 필요
+# 소요시간 :  304.74008560180664
+
+# Epoch 00064: val_loss did not improve from 0.05441
+# 1106/1106 [==============================] - 4s 4ms/step - loss: 0.0506 - accuracy: 0.9732 - val_loss: 0.0560 - val_accuracy: 0.9721
+# Epoch 00064: early stopping
+# 691/691 [==============================] - 2s 3ms/step - loss: 0.0517 - accuracy: 0.9724
+# Model: "sequential"
+# _________________________________________________________________
+# Layer (type)                 Output Shape              Param #
+# =================================================================
+# dense (Dense)                (None, 16)                272
+# _________________________________________________________________
+# dense_1 (Dense)              (None, 32)                544
+# _________________________________________________________________
+# dense_2 (Dense)              (None, 32)                1056
+# _________________________________________________________________
+# dense_3 (Dense)              (None, 1)                 33
+# =================================================================
+# Total params: 1,905
+# Trainable params: 1,905
+# Non-trainable params: 0
+# _________________________________________________________________
+# loss :  0.05166608840227127
+# acc :  0.9724484086036682 # 은닉층 2개 입력층에 relu 적용 #은닉층 3개와 같은 결과값
+# 소요시간 :  299.9599003791809

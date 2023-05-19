@@ -10,6 +10,4 @@
 
 💬 Git을 이용하여 각 팀원들이 어떤 작업을 수행하는지, 모델의 어떤 부분을 고쳐가며 정확도를 개선하는지, 어떤 하이퍼 파라미터를 사용하고 뽑아내었는지 등을 보며 코드작업을 하였고, 팀원들 서로의 코드를 리뷰하며 비슷한 형식으로 코드를 짤 수 있게 하였습니다.
 
-발표 자료는 [Figma]를 참조해주세요.
-
-[Figma] : https://www.figma.com/file/sN9PL4HVMAHC3uWxHAz4qV/AI_project?type=design&node-id=0-286&t=U6NiSAYhwZ2dLvCT-0
+발표 자료는 [Figma](https://www.figma.com/file/sN9PL4HVMAHC3uWxHAz4qV/AI_project?type=design&node-id=0-286&t=U6NiSAYhwZ2dLvCT-0)를 참조해주세요.

@@ -1,20 +1,20 @@
+#!/usr/bin/env python
+# coding: utf-8
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+from keras.models import Sequential
+from keras.layers import Dense
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
 import time
-import warnings
 
-from sklearn.svm import SVC, LinearSVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
-from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.covariance import EllipticEnvelope
+from sklearn.preprocessing import LabelEncoder
 
+import warnings
 warnings.filterwarnings('ignore')
 
-# Data preprocessing #
+# 1. Data preprocessing #
 
 path = './medical_noshow.csv'
 df = pd.read_csv(path)
@@ -99,61 +99,5 @@ from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
-##### Complete Data Preprocessing #####
 
-x_train, x_test, y_train, y_test = train_test_split(
-    x, y, test_size=0.2, shuffle=True, random_state=77
-)
-
-### kfold ###
-n_splits = 5
-random_state = 42
-kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
-
-scaler = MinMaxScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-
-param = [
-    {'learning_rate':[0.1, 0.2, 0.3], 'max_depth':[6, 8],
-    'colsample_bylevel':[0,0.1,0.2], 'n_estimators':[100,200,300],
-    'subsample':[0,0.1,0.2,0.3], 'l2_leaf_reg':[1, 3]}
-        ]
-
-#2. 모델구성
-from catboost import CatBoostClassifier
-from sklearn.model_selection import GridSearchCV
-rf_model = CatBoostClassifier()
-model = GridSearchCV(rf_model, param, cv=kfold, verbose=1,
-                     refit=True, n_jobs=-1)
-
-#3. 훈련
-import time
-start_time = time.time()
-model.fit(x_train, y_train)
-end_time = time.time() - start_time
-
-print('최적의 파라미터 : ', model.best_params_)
-print('최적의 매개변수 : ', model.best_estimator_)
-print('베스트 스코어 : ', model.best_score_)
-print('모델 스코어 : ', model.score(x_test, y_test))
-print('걸린 시간 : ', end_time, '초')
-print('CatBoost -> GridSearchCV')
-
-# Fitting 5 folds for each of 6912 candidates, totalling 34560 fits
-# 최적의 파라미터 :  {'colsample_bylevel': 0.1, 'colsample_bynode': 0.1, 'colsample_bytree': 0.2, 'gamma': 2, 'learning_rate': 0.2, 'max_depth': 3, 'min_child_weight': 0.1, 'n_estimators': 200, 'reg_alpha': 0.1, 'reg_lambda': 0.1, 'subsample': 0.1}
-# 최적의 매개변수 :  XGBClassifier(base_score=None, booster=None, callbacks=None,
-#               colsample_bylevel=0.1, colsample_bynode=0.1, colsample_bytree=0.2,
-#               early_stopping_rounds=None, enable_categorical=False,
-#               eval_metric=None, feature_types=None, gamma=2, gpu_id=None,
-#               grow_policy=None, importance_type=None,
-#               interaction_constraints=None, learning_rate=0.2, max_bin=None,
-#               max_cat_threshold=None, max_cat_to_onehot=None,
-#               max_delta_step=None, max_depth=3, max_leaves=None,
-#               min_child_weight=0.1, missing=nan, monotone_constraints=None,
-#               n_estimators=200, n_jobs=None, num_parallel_tree=None,
-#               predictor=None, random_state=None, ...)
-# 베스트 스코어 :  0.9732059039755697
-# 모델 스코어 :  0.9712721679334058
-# 걸린 시간 :  8414.870770454407 초
+##### 전처리 완료 #####

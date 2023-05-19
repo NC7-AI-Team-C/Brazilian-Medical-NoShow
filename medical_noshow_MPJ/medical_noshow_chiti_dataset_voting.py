@@ -28,10 +28,12 @@ print('Count of Columns', str(df.shape[1]))
 # 데이터프레임의 크기와 열의 수를 출력
 
 df.isnull().any().any()
+# 데이터프레임의 전체에 빈 값이 있는지 여부를 확인
 
 for i in df.columns:
     print(i+":",len(df[i].unique()))
 # 데이터프레임의 각 열에 대해 유일한 값의 수를 출력
+# 열 이름와 해당 열의 고유한 값의 개수가 함께 표시
 
 df['PatientId'].astype('int64')
 df.set_index('AppointmentID', inplace = True)
@@ -83,7 +85,7 @@ df['Handcap'] = pd.Categorical(df['Handcap'])
 Handicap = pd.get_dummies(df['Handcap'], prefix = 'Handicap')
 df = pd.concat([df, Handicap], axis=1)
 df.drop(['Handcap'], axis=1, inplace = True)
-# 'Handcap' 열을 범주형으로 변환하고, 더미 변수로 변환
+# 'Handcap' 열을 범주형으로 변환하고, 더미 변수가 생성되고 기존의 'Handcap'열은 제거
 
 df = df[(df.Age >= 0) & (df.Age <= 100)]
 df.info()
@@ -154,6 +156,17 @@ for model in classifiers:
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
 
+## 랜덤스테이트 100 / 42
 # CatBoostClassifier 's score :  0.9580618892508144
 # XGBClassifier 's score :  0.9560712993123417
 # LGBMClassifier 's score :  0.9565689467969598
+
+## 랜덤스테이트 128 / 128
+# CatBoostClassifier 's score :  0.9553926891060441
+# XGBClassifier 's score :  0.9535830618892508
+# LGBMClassifier 's score :  0.9537187839305103
+
+## 랜덤스테이트 128 / 42
+# CatBoostClassifier 's score :  0.9553926891060441
+# XGBClassifier 's score :  0.9535830618892508
+# LGBMClassifier 's score :  0.9537187839305103

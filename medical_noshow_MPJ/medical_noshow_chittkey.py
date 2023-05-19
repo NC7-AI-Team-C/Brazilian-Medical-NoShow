@@ -83,8 +83,9 @@ print("acg std: ",np.std(accuracy))
 acc = accuracy_score(y_test, y_pred_rd_clf)
 print('cv pred acc : ', acc)
 
-# avg acc:  0.9580070829862501
-# acg std:  0.008778198626543793
+# avg acc:  0.9580432748755885
+# acg std:  0.008782122369095046
+# cv pred acc :  0.9596815056098443
 
 # memory usage: 11.5 MB
 # Classification Report : 

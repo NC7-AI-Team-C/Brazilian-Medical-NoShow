@@ -101,8 +101,6 @@ x = scaler.fit_transform(x)
 # Min-Max 스케일링을 사용하여 특성 값을 0과 1 사이로 조정
 ##### 전처리 완료 #####
 
-
-
 ##### 훈련 구성 시작 #####
 x_train, x_test, y_train, y_test = train_test_split(
 x, y, test_size = 0.2, shuffle=True, random_state=42

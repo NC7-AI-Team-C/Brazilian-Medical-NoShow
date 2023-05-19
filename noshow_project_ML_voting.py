@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
+from sklearn.ensemble import VotingClassifier
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
@@ -156,3 +157,55 @@ for model in classifiers:
     score = accuracy_score(y_test, y_predict)
     class_name = model.__class__.__name__
     print(class_name, "'s score : ", score)
+
+
+
+
+n_splits = 5
+random_state = 42
+kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
+
+xgb = XGBClassifier(
+    n_estimators=3062,
+    max_depth=14,
+    random_state=213
+) # optuna로 산출한 best_parameter 적용
+
+lgbm = LGBMClassifier(
+    n_estimators=1878,
+    learning_rate=0.6004018741509568,
+    random_state=489
+) # optuna로 산출한 best_parameter 적용
+
+cat = CatBoostClassifier(
+    n_estimators=3825,
+    depth=13,
+    fold_permutation_block=146,
+    learning_rate=0.3813980309031604,
+    od_pval=0.9595288664068502,
+    l2_leaf_reg=2.877641653494577,
+    random_state=1667
+)# optuna로 산출한 best_parameter 적용
+
+model = VotingClassifier(
+    estimators=[('xgb', xgb), ('lgbm', lgbm), ('cat', cat)],
+    voting='hard',
+    n_jobs=-1,
+    verbose=0
+)
+
+model.fit(x_train, y_train)
+
+y_voting_predict = model.predict(x_test)
+voting_score = accuracy_score(y_test, y_voting_predict)
+print('voting result : ', voting_score)
+
+classifiers = [cat, xgb, lgbm]
+for model in classifiers:
+    model.fit(x_train, y_train)
+    y_predict = model.predict(x_test)
+    score = accuracy_score(y_test, y_predict)
+    class_name = model.__class__.__name__
+    print(class_name, "'s score : ", score)
+    
+print('Optuna -> voting')  

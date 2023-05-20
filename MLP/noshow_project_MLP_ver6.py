@@ -1,17 +1,17 @@
-#!/usr/bin/env python
-# coding: utf-8
 import numpy as np
 import pandas as pd
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
 import time
-
-from sklearn.covariance import EllipticEnvelope
-from sklearn.preprocessing import LabelEncoder
-
 import warnings
+
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+
 warnings.filterwarnings('ignore')
 
 # 1. Data preprocessing #

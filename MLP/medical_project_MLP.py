@@ -1,15 +1,13 @@
 import numpy as np
 import pandas as pd
+import time
+import warnings
+
 from keras.models import Sequential
 from keras.layers import Dense
+
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
-import time
 
-from sklearn.covariance import EllipticEnvelope
-from sklearn.preprocessing import LabelEncoder
-
-import warnings
 warnings.filterwarnings('ignore')
 
 # 1. Data preprocessing #

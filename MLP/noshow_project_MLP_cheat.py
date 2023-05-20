@@ -5,19 +5,16 @@ import seaborn as sns
 import time
 import warnings
 
-from sklearn.svm import SVC, LinearSVC
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
-
-# Data preprocessing #
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
 warnings.filterwarnings('ignore')
+
+# Data preprocessing #
 
 # 1. Data preprocessing #
 

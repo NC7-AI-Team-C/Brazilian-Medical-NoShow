@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 import time
 import warnings
 
@@ -10,9 +10,7 @@ from keras.layers import Dense
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
-from sklearn.covariance import EllipticEnvelope
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 
 warnings.filterwarnings('ignore')
 

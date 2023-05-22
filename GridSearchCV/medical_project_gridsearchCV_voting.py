@@ -2,16 +2,23 @@
 # coding: utf-8
 import numpy as np
 import pandas as pd
+import time
+
 from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import accuracy_score
-import time
+from sklearn.ensemble import VotingClassifier
 
 from sklearn.covariance import EllipticEnvelope
 from sklearn.preprocessing import LabelEncoder
 
 import warnings
+
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from catboost import CatBoostClassifier
+
 warnings.filterwarnings('ignore')
 
 # 1. Data preprocessing #
@@ -101,10 +108,6 @@ x = scaler.fit_transform(x)
 
 
 ######### voting ############
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
-from sklearn.ensemble import VotingClassifier
 
 x_train, x_test, y_train, y_test = train_test_split(
     x, y, train_size=0.6, test_size=0.2, random_state=100, shuffle=True

@@ -18,20 +18,20 @@ warnings.filterwarnings('ignore')
 
 path = '../medical_noshow.csv'
 df = pd.read_csv(path)
-# CSV 파일을 읽어와서 DataFrame으로 저장
+# # CSV 파일을 읽어와서 DataFrame으로 저장
 
 # print(medical_noshow.columns)
 # print(medical_noshow.head(10))
 
-print('df.shape', df.shape)
+# print('df.shape', df.shape)
 # 데이터프레임의 크기와 칼럼의 수를 출력
 
 df = df.fillna(np.nan)  # 결측값 nan으로 채우기
 df = df.dropna(axis = 0)    # nan값을 가진 행 드랍
-df.info()   # 결측치 없는것 확인
+# df.info()   # 결측치 없는것 확인
 
-for column_name in df.columns:
-    print(column_name+":",len(df[column_name].unique()))
+# for column_name in df.columns:
+#     print(column_name+":",len(df[column_name].unique()))
 # 데이터프레임의 각 칼럼에 대해 유일한 값의 수를 출력
 
 df['ScheduledDay'] = pd.to_datetime(df['ScheduledDay']).dt.date
@@ -40,21 +40,21 @@ df['AppointmentDay'] = pd.to_datetime(df['AppointmentDay']).dt.date
 
 df['Day_diff'] = (df['AppointmentDay'] - df['ScheduledDay']).dt.days
 # 'Day_diff' 칼럼을 생성하여 약속 일자와 예약 일자의 차이를 계산
-print("Day_diff값 목록 \n",df['Day_diff'].unique())
+# print("Day_diff값 목록 \n",df['Day_diff'].unique())
 # Day_diff' 칼럼의 유일한 값을 출력
-print(df[df['Day_diff']<0]['No-show'])
+# print(df[df['Day_diff']<0]['No-show'])
 # Day_diff<0 인 데이터는 노쇼로 처리했음을 확인
 
-df.info()
-print(df['No-show'][0:10])
+# df.info()
+# print(df['No-show'][0:10])
 # 각 컬럼의 데이터 타입 확인
 ob_col = list(df.dtypes[df.dtypes=='object'].index) 
 ### data type이 object인 data들의 index를 ob_col 리스트에 저장
 for col in ob_col:
     df[col] = LabelEncoder().fit_transform(df[col].values)
 # object인 데이터를 숫자형 데이터로 변환
-df.info() # 데이터 타입 변경 여부 확인
-print(df['No-show'][0:10])
+# df.info() # 데이터 타입 변경 여부 확인
+# print(df['No-show'][0:10])
 # [ no : 0, yes : 1 ]으로 정수화 되었음을 확인
 # 각 컬럼의 데이터 타입 확인
 
@@ -76,6 +76,8 @@ df['Num_App_Missed'] = df.groupby('PatientId')['No-show'].cumsum()
 # 'PatientId'가 같은 데이터끼리 그룹으로 묶어서 환자별로 고려,
 # 'Num_App_Missed' 각 환자별 누적 No-show 수를 계산한 칼럼을 생성
 
+# print('x', df[0:8])
+
 
 # print("handcap 종류 : ",df['Handcap'].unique())
 df['Handcap'] = pd.Categorical(df['Handcap'])
@@ -87,11 +89,13 @@ df = pd.concat([df, Handicap], axis=1)
 # 데이터 프레임에 핸디캡 변수를 추가, 데이터 프레임을 열방향으로 병합
 df.drop(['Handcap','ScheduledDay','AppointmentDay', 'AppointmentID','PatientId','Neighbourhood'], axis=1, inplace=True)
 # 불필요한 칼럼 삭제, inplace=True 파라미터를 통해 원본 데이터프레임 수정
-print(df.describe())    # 이상치 존재 여부 확인
+# print(df.describe())    # 이상치 존재 여부 확인
 
 df = df[(df.Age >= 0) & (df.Age <= 100)]
 # 'Age' 열의 값이 0 이상 100 이하인 행만 선택 # 이외의 값은 이상치로 판정
-df.info()   # 마지막으로 nan값 존재여부 및 데이터 타입 확인
+# df.info()   # 마지막으로 nan값 존재여부 및 데이터 타입 확인
+
+print(df[0:7])
 
 y = df['No-show']
 x = df.drop(['No-show'], axis=1)

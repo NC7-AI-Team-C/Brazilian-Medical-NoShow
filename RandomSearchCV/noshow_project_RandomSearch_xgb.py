@@ -12,6 +12,9 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import r2_score
 from sklearn.covariance import EllipticEnvelope
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import RandomizedSearchCV
+
+from xgboost import XGBClassifier
 
 warnings.filterwarnings('ignore')
 
@@ -125,8 +128,6 @@ n_splits = 5
 random_state = 42
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
-from xgboost import XGBClassifier
-from sklearn.model_selection import RandomizedSearchCV
 search_model = XGBClassifier()
 model = RandomizedSearchCV(search_model, param, cv = kfold, verbose = 1, refit = True, n_jobs = -1, n_iter=64, random_state=42)
 # n_iter : 랜덤 탐색 반복 횟수 -> 랜덤 표본의 다양화

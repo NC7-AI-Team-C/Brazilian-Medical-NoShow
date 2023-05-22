@@ -11,6 +11,9 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score, cross_val_predict
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.covariance import EllipticEnvelope
+from sklearn.model_selection import GridSearchCV
+
+from xgboost import XGBClassifier
 
 warnings.filterwarnings('ignore')
 
@@ -125,8 +128,6 @@ param = [
         ]
 
 #2. 모델구성
-from xgboost import XGBClassifier
-from sklearn.model_selection import GridSearchCV
 rf_model = XGBClassifier()
 model = GridSearchCV(rf_model, param, cv=kfold, verbose=1,
                      refit=True, n_jobs=-1)

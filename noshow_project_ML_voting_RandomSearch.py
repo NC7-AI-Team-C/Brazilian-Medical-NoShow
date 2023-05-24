@@ -4,12 +4,13 @@ import pandas as pd
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, accuracy_score
 import time
 
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
+from sklearn.ensemble import VotingClassifier
 
 from sklearn.covariance import EllipticEnvelope
 from sklearn.preprocessing import LabelEncoder

@@ -123,9 +123,9 @@ def objectiveLGBM(trial: Trial, x_train, y_train, x_test):
     }
     # 학습 모델 생성
     model = LGBMClassifier(**param)
-    XGB_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
+    LGBM_model = model.fit(x_train, y_train, verbose=True) # 학습 진행
     # 모델 성능 확인
-    score = accuracy_score(XGB_model.predict(x_test), y_test)
+    score = accuracy_score(LGBM_model.predict(x_test), y_test)
     return score
 
 # MAE가 최소가 되는 방향으로 학습을 진행
